@@ -2,27 +2,39 @@
 
 package org.ds.flink.ordering;
 
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kinesis.FlinkKinesisConsumer;
+import org.apache.flink.streaming.connectors.kinesis.config.ConsumerConfigConstants;
+
+import java.util.Properties;
 
 
 public class StreamingJob {
+
+	private static final String region = System.getenv("AWS_REGION");
+	private static String inputStreamName = "state-stream";
+
+	private static DataStream<String> createSourceFromStaticConfig(StreamExecutionEnvironment env) {
+		Properties inputProperties = new Properties();
+		inputProperties.setProperty(ConsumerConfigConstants.AWS_REGION, region);
+		inputProperties.setProperty(ConsumerConfigConstants.STREAM_INITIAL_POSITION, "LATEST");
+
+		return env.addSource(new FlinkKinesisConsumer<>(inputStreamName, new SimpleStringSchema(), inputProperties))
+				.name("state input")
+				.uid("state input");
+	}
 
 	public static void main(String[] args) throws Exception {
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
 		long baselineTimestamp = System.currentTimeMillis();
 
-		DataStream<Tuple3<String,String,Long>> inputStream = env.fromElements(
-				Tuple3.of("entity1","update", baselineTimestamp + 1000),
-				Tuple3.of("entity1","create", baselineTimestamp),
-				Tuple3.of("entity1","update", baselineTimestamp + 2000)
-		);
+		DataStream<String> input = createSourceFromStaticConfig(env);
 
-		inputStream
-				.keyBy(key -> key.f0)
-				.print();
+		input.print();
 
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
