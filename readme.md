@@ -1,6 +1,6 @@
 # Flink-ordering 
 
-Project to try out different ordering - processing time vs event time, really drives
+Project to look at event ordering and any influence of processing time vs event time, really drives
 home how timestamps are used to assign events to windows and reason about things
 wrt windows.
 

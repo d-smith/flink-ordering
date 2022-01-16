@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
-public class QuotesProducer {
-    static Logger LOG = LoggerFactory.getLogger(QuotesProducer.class);
+public class StateChangeProducer {
+    static Logger LOG = LoggerFactory.getLogger(StateChangeProducer.class);
 
     public static void main(String... args) throws Exception {
 
