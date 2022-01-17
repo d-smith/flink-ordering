@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kinesis.FlinkKinesisConsumer;
 import org.apache.flink.streaming.connectors.kinesis.config.ConsumerConfigConstants;
 import org.ds.flink.ordering.windows.AggregateSorter;
+import org.ds.flink.ordering.windows.UnpackMutations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,7 @@ public class StreamingJob {
 				.keyBy(m -> m.id)
 				.timeWindow(Time.seconds(1))
 				.aggregate(new AggregateSorter())
+				.flatMap(new UnpackMutations())
 				.print();
 
 		// execute program
